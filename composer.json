@@ -1,0 +1,35 @@
+{
+    "name": "tenolo/doctrine-table-prefix-bundle",
+    "description": "",
+    "keywords": ["doctrine", "table", "prefix", "tenolo"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "homepage": "http://tenolo.de",
+    "authors": [
+        {
+            "name": "tenolo - Robert Bernis, Johannes Herberhold GbR",
+            "email": "info@tenolo.de",
+            "homepage": "http://tenolo.de"
+        },
+        {
+            "name": "Nikita Loges",
+            "email": "n.loges@tenolo.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "tenolo/core-bundle": "dev-master",
+        "doctrine/doctrine-bundle": "~1.2",
+        "symfony/framework-bundle": "~2.4"
+    },
+    "require-dev": {
+        "symfony/assetic-bundle": "~2.3",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Tenolo\\DoctrineTablePrefixBundle": ""
+        }
+    },
+    "target-dir": "Tenolo/DoctrineTablePrefixBundle"
+}

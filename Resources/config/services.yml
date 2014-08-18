@@ -1,0 +1,9 @@
+parameters:
+    tenolo.tableprefix.subscriber.class: Tenolo\DoctrineTablePrefixBundle\Subscriber\TablePrefixSubscriber
+
+services:
+    tenolo.table.prefix:
+        class: %tenolo.tableprefix.subscriber.class%
+        arguments: [%database_prefix%, @annotation_reader]
+        tags:
+            - { name: doctrine.event_subscriber }
