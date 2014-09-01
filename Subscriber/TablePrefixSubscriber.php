@@ -2,11 +2,15 @@
 
 namespace Tenolo\DoctrineTablePrefixBundle\Subscriber;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Component\Security\Core\Util\StringUtils;
+use Tenolo\CoreBundle\Util\CryptUtil;
+use Tenolo\CoreBundle\Util\StringUtil;
 
 /**
  * Class TablePrefixSubscriber
@@ -25,6 +29,16 @@ class TablePrefixSubscriber implements EventSubscriber
     protected $prefix = '';
 
     /**
+     * @var ArrayCollection
+     */
+    protected $loadedClasses;
+
+    /**
+     * @var ArrayCollection
+     */
+    protected $processedAssociation;
+
+    /**
      * @param $prefix
      * @param Reader $reader
      */
@@ -32,6 +46,9 @@ class TablePrefixSubscriber implements EventSubscriber
     {
         $this->prefix = (string)$prefix;
         $this->reader = $reader;
+
+        $this->loadedClasses = new ArrayCollection();
+        $this->processedAssociation = new ArrayCollection();
     }
 
     /**
@@ -51,31 +68,45 @@ class TablePrefixSubscriber implements EventSubscriber
         $classMetadata = $args->getClassMetadata();
 
         // Do not re-apply the prefix in an inheritance hierarchy.
-        if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
-            return;
-        }
+        if (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->isRootEntity()) {
+            $classReflection = $classMetadata->getReflectionClass();
+            $className = $classReflection->getName();
 
-        $classReflection = $classMetadata->getReflectionClass();
-        $classAnnotation = $this->reader->getClassAnnotation($classReflection, 'Tenolo\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
-
-        $prefix = $this->prefix;
-
-        if (!is_null($classAnnotation)) {
-            $tablePrefix = trim($classAnnotation->name);
-
-            if (!empty($tablePrefix)) {
-                $prefix .= $tablePrefix . "_";
+            if($this->loadedClasses->contains($className)) {
+                return;
+            } else {
+                $this->loadedClasses->add($className);
             }
-        }
 
-        $classMetadata->setPrimaryTable(array(
-            'name' => $prefix . $classMetadata->getTableName()
-        ));
+            $classAnnotation = $this->reader->getClassAnnotation($classReflection, 'Tenolo\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
+
+            $prefix = $this->prefix;
+
+            if (!is_null($classAnnotation)) {
+                $tablePrefix = trim($classAnnotation->name);
+
+                if (!empty($tablePrefix)) {
+                    $prefix .= $tablePrefix . "_";
+                }
+            }
+
+            $classMetadata->setPrimaryTable(array(
+                'name' => $prefix . $classMetadata->getTableName()
+            ));
+        }
 
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
             if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
-                $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
-                $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName;
+                $sourceEntity = $classMetadata->associationMappings[$fieldName]['sourceEntity'];
+                $targetEntity = $classMetadata->associationMappings[$fieldName]['targetEntity'];
+                $serial = CryptUtil::getHash($sourceEntity.'-'.$targetEntity);
+
+                if(!$this->processedAssociation->contains($serial)) {
+                    $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
+                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName. '_map';
+
+                    $this->processedAssociation->add($serial);
+                }
             }
         }
     }
