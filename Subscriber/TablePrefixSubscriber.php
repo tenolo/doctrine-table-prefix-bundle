@@ -72,7 +72,7 @@ class TablePrefixSubscriber implements EventSubscriber
             $classReflection = $classMetadata->getReflectionClass();
             $className = $classReflection->getName();
 
-            if($this->loadedClasses->contains($className)) {
+            if ($this->loadedClasses->contains($className)) {
                 return;
             } else {
                 $this->loadedClasses->add($className);
@@ -99,11 +99,11 @@ class TablePrefixSubscriber implements EventSubscriber
             if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
                 $sourceEntity = $classMetadata->associationMappings[$fieldName]['sourceEntity'];
                 $targetEntity = $classMetadata->associationMappings[$fieldName]['targetEntity'];
-                $serial = CryptUtil::getHash($sourceEntity.'-'.$targetEntity);
+                $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity);
 
-                if(!$this->processedAssociation->contains($serial)) {
+                if (!$this->processedAssociation->contains($serial)) {
                     $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
-                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName. '_map';
+                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName . '_map';
 
                     $this->processedAssociation->add($serial);
                 }
