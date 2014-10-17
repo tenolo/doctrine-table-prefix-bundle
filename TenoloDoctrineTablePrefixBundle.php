@@ -2,6 +2,7 @@
 
 namespace Tenolo\DoctrineTablePrefixBundle;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -12,4 +13,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class TenoloDoctrineTablePrefixBundle extends Bundle
 {
+    /**
+     * @{@inheritdoc}
+     */
+    public function boot()
+    {
+        // register doctrine annotation
+        AnnotationRegistry::registerAutoloadNamespace('Tenolo\DoctrineTablePrefixBundle\Doctrine\Annotations', __DIR__ . '/../..');
+    }
 }
