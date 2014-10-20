@@ -9,8 +9,8 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Security\Core\Util\StringUtils;
-use Tenolo\CoreBundle\Util\CryptUtil;
-use Tenolo\CoreBundle\Util\StringUtil;
+use Tenolo\CoreBundle\Util\Crypt;
+use Tenolo\CoreBundle\Util\String;
 
 /**
  * Class TablePrefixSubscriber
@@ -99,7 +99,7 @@ class TablePrefixSubscriber implements EventSubscriber
             if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])) {
                 $sourceEntity = $classMetadata->associationMappings[$fieldName]['sourceEntity'];
                 $targetEntity = $classMetadata->associationMappings[$fieldName]['targetEntity'];
-                $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity);
+                $serial = Crypt::getHash($sourceEntity . '-' . $targetEntity);
 
                 if (!$this->processedAssociation->contains($serial)) {
                     $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
