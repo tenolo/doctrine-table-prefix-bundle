@@ -2,15 +2,13 @@
 
 namespace Tenolo\DoctrineTablePrefixBundle\Subscriber;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\Security\Core\Util\StringUtils;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Tenolo\CoreBundle\Util\Crypt;
-use Tenolo\CoreBundle\Util\String;
 
 /**
  * Class TablePrefixSubscriber
