@@ -29,6 +29,44 @@
         "symfony/assetic-bundle": "~2.3",
         "phpunit/phpunit": "~4.3"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---core-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---bootstrap-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---admin-control-panel-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---doctrine-discriminator-map-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---doctrine-table-prefix-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---media-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---permission-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---translation-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://git@stash.tenolo.com/scm/ten/symfony---user-bundle.git"
+        }
+    ],
     "autoload": {
         "psr-0": {
             "Tenolo\\DoctrineTablePrefixBundle": ""
