@@ -13,7 +13,7 @@ use Tenolo\CoreBundle\Util\Crypt;
 /**
  * Class TablePrefixSubscriber
  *
- * @package RabeConcept\MSSBundle\Subscriber
+ * @package Tenolo\DoctrineTablePrefixBundle\Subscriber
  * @author Nikita Loges
  * @company tenolo GbR
  * @date 03.06.14
