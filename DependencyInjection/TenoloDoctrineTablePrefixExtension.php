@@ -1,6 +1,6 @@
 <?php
 
-namespace Tenolo\DoctrineTablePrefixBundle\DependencyInjection;
+namespace Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * Class TenoloDoctrineTablePrefixExtension
- * @package Tenolo\DoctrineTablePrefixBundle\DependencyInjection
+ * @package Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection
  * @author Nikita Loges
  * @company tenolo GbR
  * @date ${DATE}

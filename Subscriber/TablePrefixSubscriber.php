@@ -1,6 +1,6 @@
 <?php
 
-namespace Tenolo\DoctrineTablePrefixBundle\Subscriber;
+namespace Tenolo\Bundle\DoctrineTablePrefixBundle\Subscriber;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -8,12 +8,12 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Tenolo\CoreBundle\Util\Crypt;
+use Tenolo\Bundle\CoreBundle\Util\Crypt;
 
 /**
  * Class TablePrefixSubscriber
  *
- * @package Tenolo\DoctrineTablePrefixBundle\Subscriber
+ * @package Tenolo\Bundle\DoctrineTablePrefixBundle\Subscriber
  * @author Nikita Loges
  * @company tenolo GbR
  * @date 03.06.14
@@ -76,7 +76,7 @@ class TablePrefixSubscriber implements EventSubscriber
                 $this->loadedClasses->add($className);
             }
 
-            $classAnnotation = $this->reader->getClassAnnotation($classReflection, 'Tenolo\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
+            $classAnnotation = $this->reader->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
 
             $prefix = $this->prefix;
 

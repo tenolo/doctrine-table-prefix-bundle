@@ -31,8 +31,8 @@
     },
     "autoload": {
         "psr-0": {
-            "Tenolo\\DoctrineTablePrefixBundle": ""
+            "Tenolo\\Bundle\\DoctrineTablePrefixBundle": ""
         }
     },
-    "target-dir": "Tenolo/DoctrineTablePrefixBundle"
+    "target-dir": "Tenolo/Bundle/DoctrineTablePrefixBundle"
 }

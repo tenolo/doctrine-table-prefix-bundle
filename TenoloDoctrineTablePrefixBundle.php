@@ -1,13 +1,13 @@
 <?php
 
-namespace Tenolo\DoctrineTablePrefixBundle;
+namespace Tenolo\Bundle\DoctrineTablePrefixBundle;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * Class TenoloDoctrineTablePrefixBundle
- * @package Tenolo\DoctrineTablePrefixBundle
+ * @package Tenolo\Bundle\DoctrineTablePrefixBundle
  * @author Nikita Loges
  * @company tenolo GbR
  */

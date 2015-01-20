@@ -1,13 +1,13 @@
 <?php
 
-namespace Tenolo\DoctrineTablePrefixBundle\DependencyInjection;
+namespace Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * Class Configuration
- * @package Tenolo\DoctrineTablePrefixBundle\DependencyInjection
+ * @package Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection
  * @author Nikita Loges
  * @company tenolo GbR
  */

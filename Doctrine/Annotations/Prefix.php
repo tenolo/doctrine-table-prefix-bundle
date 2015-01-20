@@ -1,10 +1,10 @@
 <?php
 
-namespace Tenolo\DoctrineTablePrefixBundle\Doctrine\Annotations;
+namespace Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations;
 
 /**
  * Class Prefix
- * @package Tenolo\DoctrineTablePrefixBundle\Doctrine\Annotations
+ * @package Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations
  * @author Nikita Loges
  *
  * @Annotation

@@ -1,5 +1,5 @@
 parameters:
-    tenolo.tableprefix.subscriber.class: Tenolo\DoctrineTablePrefixBundle\Subscriber\TablePrefixSubscriber
+    tenolo.tableprefix.subscriber.class: Tenolo\Bundle\DoctrineTablePrefixBundle\Subscriber\TablePrefixSubscriber
 
 services:
     tenolo.table.prefix:
