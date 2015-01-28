@@ -65,27 +65,26 @@ class TablePrefixSubscriber implements EventSubscriber
         /** @var ClassMetadata $classMetadata */
         $classMetadata = $args->getClassMetadata();
 
+        $classReflection = $classMetadata->getReflectionClass();
+        $className = $classReflection->getName();
+        $classAnnotation = $this->reader->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
+
+        $prefix = $this->prefix;
+        if (!is_null($classAnnotation)) {
+            $tablePrefix = trim($classAnnotation->name);
+
+            if (!empty($tablePrefix)) {
+                $prefix .= $tablePrefix . "_";
+            }
+        }
+
         // Do not re-apply the prefix in an inheritance hierarchy.
         if (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->isRootEntity()) {
-            $classReflection = $classMetadata->getReflectionClass();
-            $className = $classReflection->getName();
 
             if ($this->loadedClasses->contains($className)) {
                 return;
             } else {
                 $this->loadedClasses->add($className);
-            }
-
-            $classAnnotation = $this->reader->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
-
-            $prefix = $this->prefix;
-
-            if (!is_null($classAnnotation)) {
-                $tablePrefix = trim($classAnnotation->name);
-
-                if (!empty($tablePrefix)) {
-                    $prefix .= $tablePrefix . "_";
-                }
             }
 
             $classMetadata->setPrimaryTable(array(
@@ -101,7 +100,7 @@ class TablePrefixSubscriber implements EventSubscriber
 
                 if (!$this->processedAssociation->contains($serial)) {
                     $mappedTableName = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
-                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $this->prefix . $mappedTableName . '_map';
+                    $classMetadata->associationMappings[$fieldName]['joinTable']['name'] = $prefix . $mappedTableName . '_map';
 
                     $this->processedAssociation->add($serial);
                 }
