@@ -1,9 +1,10 @@
 parameters:
-    tenolo.tableprefix.subscriber.class: Tenolo\Bundle\DoctrineTablePrefixBundle\Subscriber\TablePrefixSubscriber
+    tenolo_doctrine_table_prefix.event.table_prefix.class: Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener\TablePrefixListener
+    doctrine.orm.listeners.resolve_target_entity.class: Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener\ResolveTargetEntityListener
 
 services:
-    tenolo.table.prefix:
-        class: %tenolo.tableprefix.subscriber.class%
-        arguments: [%database_prefix%, @annotation_reader]
+    tenolo_doctrine_table_prefix.event.table_prefix:
+        class: %tenolo_doctrine_table_prefix.event.table_prefix.class%
+        arguments: [@service_container, %database_prefix%]
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: doctrine.event_listener, event: loadClassMetadata,  method: loadClassMetadata, priority: -10 }
