@@ -21,7 +21,7 @@
 
         "symfony/framework-bundle": "~2.4",
 
-        "tenolo/core-bundle": "dev-develop",
+        "tenolo/core-bundle": "1.0.*@dev",
 
         "doctrine/doctrine-bundle": "~1.2"
     },
@@ -30,9 +30,13 @@
         "phpunit/phpunit": "~4.3"
     },
     "autoload": {
-        "psr-0": {
-            "Tenolo\\Bundle\\DoctrineTablePrefixBundle": ""
+        "psr-4": {
+            "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\": ""
         }
     },
-    "target-dir": "Tenolo/Bundle/DoctrineTablePrefixBundle"
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "1.0-dev"
+        }
+    }
 }
