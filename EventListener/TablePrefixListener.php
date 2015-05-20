@@ -85,7 +85,7 @@ class TablePrefixListener extends AbstractService
 
         $classReflection = $classMetadata->getReflectionClass();
         $className = $classReflection->getName();
-        $classAnnotation = $this->getReader()->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
+        $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
 
         $prefix = $this->prefix;
         if (!is_null($classAnnotation)) {
