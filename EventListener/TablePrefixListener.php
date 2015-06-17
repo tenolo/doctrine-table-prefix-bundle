@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Tenolo\Bundle\CoreBundle\Service\AbstractService;
 use Tenolo\Bundle\CoreBundle\Util\Crypt;
-use Tenolo\Bundle\CoreBundle\Util\String;
 
 /**
  * Class TablePrefixListener
@@ -84,6 +83,11 @@ class TablePrefixListener extends AbstractService
         $classMetadata = $args->getClassMetadata();
 
         $classReflection = $classMetadata->getReflectionClass();
+
+        if (!$classReflection) {
+            return;
+        }
+
         $className = $classReflection->getName();
         $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
 
