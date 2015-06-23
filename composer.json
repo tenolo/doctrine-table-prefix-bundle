@@ -23,11 +23,20 @@
     ],
     "require": {
         "php": ">=5.4",
+
+        "symfony/http-kernel": "~2.7",
+        "symfony/config": "~2.7",
+        "symfony/dependency-injection": "~2.7",
+        "symfony/event-dispatcher": "~2.7",
+
+        "doctrine/orm": "~2.5",
+        "doctrine/common": "~2.5",
+
         "tenolo/core-bundle": "1.0.*@dev"
     },
     "require-dev": {
-        "symfony/assetic-bundle": "~2.3",
-        "phpunit/phpunit": "~4.3"
+        "symfony/assetic-bundle": "~2.6",
+        "phpunit/phpunit": "~4.7"
     },
     "autoload": {
         "psr-4": {
