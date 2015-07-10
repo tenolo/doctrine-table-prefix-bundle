@@ -32,7 +32,7 @@
         "doctrine/orm": "~2.5",
         "doctrine/common": "~2.5",
 
-        "tenolo/core-bundle": "1.0.*@dev"
+        "tenolo/core-bundle": "1.0.*"
     },
     "require-dev": {
         "symfony/assetic-bundle": "~2.6",
