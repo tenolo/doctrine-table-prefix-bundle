@@ -2,6 +2,7 @@
 
 namespace Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener;
 
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -13,13 +14,23 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  * @company tenolo GbR
  * @date 05.03.2015
  */
-class ResolveTargetEntityListener
+class ResolveTargetEntityListener implements EventSubscriber
 {
 
     /**
      * @var array
      */
     protected $resolveTargetEntities = array();
+
+    /**
+     * @return array
+     */
+    public function getSubscribedEvents()
+    {
+        return array(
+          'loadClassMetadata',
+        );
+    }
 
     /**
      * Adds a target-entity class name to resolve to a new class name.
