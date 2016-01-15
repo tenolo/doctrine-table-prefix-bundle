@@ -17,14 +17,10 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class ResolveTargetEntityListener implements EventSubscriber
 {
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $resolveTargetEntities = array();
 
-    /**
-     * @return array
-     */
+    /** @return array */
     public function getSubscribedEvents()
     {
         return array(
