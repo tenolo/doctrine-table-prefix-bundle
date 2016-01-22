@@ -32,7 +32,7 @@
         "doctrine/orm": "~2.5",
         "doctrine/common": "~2.6",
 
-        "tenolo/core-bundle": "1.1.*@dev"
+        "tenolo/core-bundle": "^2.0@dev"
     },
     "require-dev": {
         "symfony/assetic-bundle": "~2.7",
@@ -41,11 +41,6 @@
     "autoload": {
         "psr-4": {
             "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\": ""
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "1.1-dev"
         }
     }
 }
