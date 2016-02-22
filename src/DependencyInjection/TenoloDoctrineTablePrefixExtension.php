@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection
  * @author Nikita Loges
  * @company tenolo GbR
- * @date ${DATE}
  */
 class TenoloDoctrineTablePrefixExtension extends Extension
 {

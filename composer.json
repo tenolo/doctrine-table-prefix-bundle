@@ -23,29 +23,34 @@
     ],
     "require": {
         "php": ">=5.6",
-
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
-        "symfony/event-dispatcher": "~2.8|~3.0",
-
         "doctrine/orm": "~2.5",
         "doctrine/common": "~2.6",
-
         "tenolo/core-bundle": "^2.0@dev"
     },
     "require-dev": {
         "symfony/assetic-bundle": "~2.7",
         "symfony/phpunit-bridge": "~2.8|~3.0"
     },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://repo.tenolo.com/repo/private/"
+        }
+    ],
     "autoload": {
         "psr-4": {
-            "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\": ""
+            "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\": "src/",
+            "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\Tests\\": "tests/"
         }
     },
     "extra": {
         "branch-alias": {
             "dev-develop": "2.0-dev"
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
