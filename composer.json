@@ -42,7 +42,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\": "src/",
+            "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\Tests\\": "tests/"
         }
     },
