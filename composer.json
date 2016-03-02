@@ -52,7 +52,8 @@
     "extra": {
         "branch-alias": {
             "dev-release/1.0": "1.0-dev",
-            "dev-release/1.1": "1.1-dev"
+            "dev-release/1.1": "1.1-dev",
+            "dev-release/2.0": "2.0-dev"
         }
     },
     "minimum-stability": "dev",
