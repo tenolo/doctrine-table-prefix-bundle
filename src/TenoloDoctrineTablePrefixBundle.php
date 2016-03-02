@@ -13,8 +13,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class TenoloDoctrineTablePrefixBundle extends Bundle
 {
+
     /**
-     * @{@inheritdoc}
+     * @inheritdoc
      */
     public function boot()
     {

@@ -2,13 +2,12 @@
 
 namespace Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Tenolo\Bundle\CoreBundle\Service\AbstractService;
-use Tenolo\Bundle\CoreBundle\Util\Crypt;
+use Tenolo\Bundle\CoreBundle\Util\CryptUtil;
 
 /**
  * Class TablePrefixListener
@@ -21,19 +20,13 @@ use Tenolo\Bundle\CoreBundle\Util\Crypt;
 class TablePrefixListener extends AbstractService
 {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $prefix = '';
 
-    /**
-     * @var ArrayCollection
-     */
+    /** @var ArrayCollection */
     protected $loadedClasses;
 
-    /**
-     * @var ArrayCollection
-     */
+    /** @var ArrayCollection */
     protected $processedAssociation;
 
     /**
@@ -118,7 +111,7 @@ class TablePrefixListener extends AbstractService
             if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY && isset($mapping['joinTable']['name'])) {
                 $sourceEntity = $mapping['sourceEntity'];
                 $targetEntity = $mapping['targetEntity'];
-                $serial = Crypt::getHash($sourceEntity . '-' . $targetEntity);
+                $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity);
 
                 // set only new associations
                 if (!$this->getProcessedAssociation()->contains($serial)) {
