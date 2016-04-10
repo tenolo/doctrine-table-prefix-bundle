@@ -8,14 +8,15 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Tenolo\Bundle\CoreBundle\Service\AbstractService;
 use Tenolo\Bundle\CoreBundle\Util\CryptUtil;
+use Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix;
 
 /**
  * Class TablePrefixListener
  *
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener
- * @author Nikita Loges
+ * @author  Nikita Loges
  * @company tenolo GbR
- * @date 03.06.14
+ * @date    03.06.14
  */
 class TablePrefixListener extends AbstractService
 {
@@ -82,9 +83,24 @@ class TablePrefixListener extends AbstractService
         }
 
         $className = $classReflection->getName();
-        $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
+        $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, Prefix::class);
 
-        $prefix = $this->prefix;
+        $namespace = $classReflection->getNamespaceName();
+        $namespaceParts = explode('\\', $namespace);
+
+        foreach($namespaceParts as $key => $value) {
+            $value = str_replace(['Entity', 'Bundle'], '', $value);
+
+            if(empty($value)) {
+                unset($namespaceParts[$key]);
+            } else {
+                $namespaceParts[$key] = $value;
+            }
+        }
+
+        $namespacePrefix = strtolower(implode('_', $namespaceParts));
+
+        $prefix = $this->prefix.$namespacePrefix.'_';
         if (!is_null($classAnnotation)) {
             $tablePrefix = trim($classAnnotation->name);
 
@@ -102,9 +118,9 @@ class TablePrefixListener extends AbstractService
                 $this->getLoadedClasses()->add($className);
             }
 
-            $classMetadata->setPrimaryTable(array(
+            $classMetadata->setPrimaryTable([
                 'name' => $prefix . $classMetadata->getTableName()
-            ));
+            ]);
         }
 
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
