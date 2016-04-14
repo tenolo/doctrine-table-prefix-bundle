@@ -7,7 +7,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Tenolo\Bundle\CoreBundle\Service\AbstractService;
-use Tenolo\Bundle\CoreBundle\Util\CryptUtil;
+use Tenolo\Utilities\Utils\CryptUtil;
 use Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix;
 
 /**
