@@ -23,14 +23,19 @@
     ],
     "require": {
         "php": ">=5.6",
+
         "symfony/framework-bundle": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
+
         "doctrine/orm": "~2.5",
         "doctrine/common": "~2.6",
+
         "tenolo/core-bundle": "~2.0@dev",
-        "tenolo/utilities": "~1.0"
+        "tenolo/utilities": "~1.0",
+
+        "mmoreram/symfony-bundle-dependencies": "~1.0"
     },
     "require-dev": {
         "symfony/assetic-bundle": "~2.7",
