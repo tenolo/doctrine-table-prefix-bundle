@@ -89,7 +89,7 @@ class TablePrefixListener extends AbstractService
         $namespaceParts = explode('\\', $namespace);
 
         foreach($namespaceParts as $key => $value) {
-            $value = str_replace(['Entity', 'Bundle'], '', $value);
+            $value = str_replace(['Entity', 'Bundle', 'Application', 'Extension'], '', $value);
 
             if(empty($value)) {
                 unset($namespaceParts[$key]);
