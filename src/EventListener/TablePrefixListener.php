@@ -7,8 +7,8 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Tenolo\Bundle\CoreBundle\Service\AbstractService;
-use Tenolo\Utilities\Utils\CryptUtil;
 use Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix;
+use Tenolo\Utilities\Utils\CryptUtil;
 
 /**
  * Class TablePrefixListener
@@ -32,7 +32,7 @@ class TablePrefixListener extends AbstractService
 
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-     * @param $prefix
+     * @param                                                           $prefix
      */
     public function __construct($container, $prefix)
     {
@@ -88,19 +88,35 @@ class TablePrefixListener extends AbstractService
         $namespace = $classReflection->getNamespaceName();
         $namespaceParts = explode('\\', $namespace);
 
-        foreach($namespaceParts as $key => $value) {
+        foreach ($namespaceParts as $key => $value) {
             $value = str_replace(['Entity', 'Bundle', 'Application', 'Extension'], '', $value);
 
-            if(empty($value)) {
+            if (empty($value)) {
                 unset($namespaceParts[$key]);
             } else {
+                if (!ctype_upper($value)) {
+                    $values = preg_split('/(?=[A-Z])/', $value);
+                    $values = array_filter($values, function($el) {
+                        return (!empty($el));                        
+                    });
+
+                    if (count($values) > 1) {
+                        $value = '';
+                        foreach ($values as $v) {
+                            $value .= $v[0];
+                        }
+                    } else {
+                        $value = array_shift($values);
+                    }
+                }
+
                 $namespaceParts[$key] = $value;
             }
         }
 
         $namespacePrefix = strtolower(implode('_', $namespaceParts));
 
-        $prefix = $this->prefix.$namespacePrefix.'_';
+        $prefix = $this->prefix . $namespacePrefix . '_';
         if (!is_null($classAnnotation)) {
             $tablePrefix = trim($classAnnotation->name);
 
