@@ -17,9 +17,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class ResolveTargetEntityListener implements EventSubscriber
 {
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $resolveTargetEntities = array();
 
     /**

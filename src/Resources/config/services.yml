@@ -4,7 +4,7 @@ parameters:
 
 services:
     tenolo_doctrine_table_prefix.event.table_prefix:
-        class: %tenolo_doctrine_table_prefix.event.table_prefix.class%
-        arguments: [@service_container, %database_prefix%]
+        class: "%tenolo_doctrine_table_prefix.event.table_prefix.class%"
+        arguments: ["@service_container"]
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata,  method: loadClassMetadata, priority: -10 }
