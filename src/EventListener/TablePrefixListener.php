@@ -7,15 +7,16 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Tenolo\Bundle\CoreBundle\Service\AbstractService;
-use Tenolo\Bundle\CoreBundle\Util\CryptUtil;
+use Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix;
+use Tenolo\Utilities\Utils\CryptUtil;
 
 /**
  * Class TablePrefixListener
  *
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener
- * @author Nikita Loges
+ * @author  Nikita Loges
  * @company tenolo GbR
- * @date 03.06.14
+ * @date    03.06.14
  */
 class TablePrefixListener extends AbstractService
 {
@@ -31,7 +32,7 @@ class TablePrefixListener extends AbstractService
 
     /**
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-     * @param $prefix
+     * @param                                                           $prefix
      */
     public function __construct($container, $prefix)
     {
@@ -82,9 +83,40 @@ class TablePrefixListener extends AbstractService
         }
 
         $className = $classReflection->getName();
-        $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
+        $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, Prefix::class);
 
-        $prefix = $this->prefix;
+        $namespace = $classReflection->getNamespaceName();
+        $namespaceParts = explode('\\', $namespace);
+
+        foreach ($namespaceParts as $key => $value) {
+            $value = str_replace(['Entity', 'Bundle', 'Application', 'Extension'], '', $value);
+
+            if (empty($value)) {
+                unset($namespaceParts[$key]);
+            } else {
+                if (!ctype_upper($value)) {
+                    $values = preg_split('/(?=[A-Z])/', $value);
+                    $values = array_filter($values, function($el) {
+                        return (!empty($el));                        
+                    });
+
+                    if (count($values) > 1) {
+                        $value = '';
+                        foreach ($values as $v) {
+                            $value .= $v[0];
+                        }
+                    } else {
+                        $value = array_shift($values);
+                    }
+                }
+
+                $namespaceParts[$key] = $value;
+            }
+        }
+
+        $namespacePrefix = strtolower(implode('_', $namespaceParts));
+
+        $prefix = $this->prefix . $namespacePrefix . '_';
         if (!is_null($classAnnotation)) {
             $tablePrefix = trim($classAnnotation->name);
 
@@ -102,9 +134,9 @@ class TablePrefixListener extends AbstractService
                 $this->getLoadedClasses()->add($className);
             }
 
-            $classMetadata->setPrimaryTable(array(
+            $classMetadata->setPrimaryTable([
                 'name' => $prefix . $classMetadata->getTableName()
-            ));
+            ]);
         }
 
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {

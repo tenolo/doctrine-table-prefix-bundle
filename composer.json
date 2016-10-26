@@ -1,10 +1,13 @@
 {
     "name": "tenolo/doctrine-table-prefix-bundle",
-    "description": "",
+    "description": "Adds the feature to add table prefix to an entity.",
     "keywords": [
         "doctrine",
         "table",
         "prefix",
+        "entity",
+        "symfony",
+        "bundle",
         "tenolo"
     ],
     "type": "symfony-bundle",
@@ -22,16 +25,22 @@
         }
     ],
     "require": {
-        "php": ">=5.6",
+        "php": "~5.5|~7.0",
+
+        "symfony/framework-bundle": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
+
         "doctrine/orm": "~2.5",
         "doctrine/common": "~2.6",
-        "tenolo/core-bundle": "~2.0@dev"
+
+        "tenolo/core-bundle": "~3.0",
+        "tenolo/utilities": "~1.0",
+
+        "mmoreram/symfony-bundle-dependencies": "~1.0"
     },
     "require-dev": {
-        "symfony/assetic-bundle": "~2.7",
         "symfony/phpunit-bridge": "~2.8|~3.0"
     },
     "repositories": [
@@ -53,8 +62,8 @@
     "extra": {
         "branch-alias": {
             "dev-release/1.0": "1.0-dev",
-            "dev-release/1.1": "1.1-dev",
-            "dev-release/2.0": "2.0-dev"
+            "dev-release/2.0": "2.0-dev",
+            "dev-release/3.0": "3.0-dev"
         }
     },
     "minimum-stability": "dev",
