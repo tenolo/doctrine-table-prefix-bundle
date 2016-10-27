@@ -27,10 +27,10 @@
     "require": {
         "php": "~5.5|~7.0",
 
-        "symfony/http-kernel": "~2.7",
-        "symfony/config": "~2.7",
-        "symfony/dependency-injection": "~2.7",
-        "symfony/event-dispatcher": "~2.7",
+        "symfony/http-kernel": "~2.8",
+        "symfony/config": "~2.8",
+        "symfony/dependency-injection": "~2.8",
+        "symfony/event-dispatcher": "~2.8",
 
         "doctrine/orm": "~2.5",
         "doctrine/common": "~2.5",
