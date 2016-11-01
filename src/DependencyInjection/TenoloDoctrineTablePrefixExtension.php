@@ -30,6 +30,7 @@ class TenoloDoctrineTablePrefixExtension extends ConfigurableExtension
         $container->setParameter('tenolo_doctrine_table_prefix.database_prefix', $configs['database_prefix']);
         $container->setParameter('tenolo_doctrine_table_prefix.namespace_prefix.enable', $configs['namespace_prefix']['enable']);
         $container->setParameter('tenolo_doctrine_table_prefix.namespace_prefix.word_blacklist', $configs['namespace_prefix']['word_blacklist']);
+        $container->setParameter('tenolo_doctrine_table_prefix.namespace_prefix.replacements', $configs['namespace_prefix']['replacements']);
         $container->setParameter('tenolo_doctrine_table_prefix.annotation_prefix.enable', $configs['annotation_prefix']['enable']);
     }
 }
