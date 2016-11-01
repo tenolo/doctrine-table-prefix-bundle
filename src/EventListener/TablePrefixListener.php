@@ -144,6 +144,7 @@ class TablePrefixListener extends AbstractService
         $namespace = $classReflection->getNamespaceName();
         $namespaceParts = explode('\\', $namespace);
         $blackList = $this->getWordBlackList();
+        $replacements = $this->getNamespaceReplacements();
 
         foreach ($namespaceParts as $key => $value) {
             if (empty($value)) {
@@ -153,6 +154,13 @@ class TablePrefixListener extends AbstractService
                     $values = preg_split('/(?=[A-Z])/', $value);
 
                     $values = array_map('strtolower', $values);
+                    $values = array_map(function ($value) use ($replacements) {
+                        if (array_key_exists($value, $replacements)) {
+                            return $replacements[$value];
+                        }
+
+                        return $value;
+                    }, $values);
                     $values = array_filter($values, function ($el) {
                         return !empty($el);
                     });
@@ -260,6 +268,14 @@ class TablePrefixListener extends AbstractService
     protected function getConfigWordBlackList()
     {
         return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.namespace_prefix.word_blacklist');
+    }
+
+    /**
+     * @return array
+     */
+    protected function getNamespaceReplacements()
+    {
+        return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.namespace_prefix.replacements');
     }
 
     /**
