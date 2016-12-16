@@ -9,10 +9,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * Class TenoloDoctrineTablePrefixExtension
+ *
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection
- * @author Nikita Loges
+ * @author  Nikita Loges
  * @company tenolo GbR
- * @date ${DATE}
  */
 class TenoloDoctrineTablePrefixExtension extends Extension
 {
