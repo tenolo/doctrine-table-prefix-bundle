@@ -13,7 +13,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection
  * @author  Nikita Loges
  * @company tenolo GbR
- * @date    ${DATE}
  */
 class TenoloDoctrineTablePrefixExtension extends ConfigurableExtension
 {

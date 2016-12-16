@@ -4,30 +4,32 @@ namespace Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Event\OnClassMetadataNotFoundEventArgs;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * Class ResolveTargetEntityListener
+ *
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener
- * @author Nikita Loges
- * @company tenolo GbR
- * @date 05.03.2015
+ * @author  Nikita Loges
  */
 class ResolveTargetEntityListener implements EventSubscriber
 {
 
     /** @var array */
-    protected $resolveTargetEntities = array();
+    protected $resolveTargetEntities = [];
 
     /**
      * @return array
      */
     public function getSubscribedEvents()
     {
-        return array(
-            'loadClassMetadata',
-        );
+        return [
+            Events::loadClassMetadata,
+            Events::onClassMetadataNotFound
+        ];
     }
 
     /**
@@ -46,6 +48,24 @@ class ResolveTargetEntityListener implements EventSubscriber
     }
 
     /**
+     * @param OnClassMetadataNotFoundEventArgs $args
+     *
+     * @internal this is an event callback, and should not be called directly
+     *
+     * @return void
+     */
+    public function onClassMetadataNotFound(OnClassMetadataNotFoundEventArgs $args)
+    {
+        if (array_key_exists($args->getClassName(), $this->resolveTargetEntities)) {
+            $args->setFoundMetadata(
+                $args
+                    ->getObjectManager()
+                    ->getClassMetadata($this->resolveTargetEntities[$args->getClassname()]['targetEntity'])
+            );
+        }
+    }
+
+    /**
      * Processes event and resolves new target entity names.
      *
      * @param LoadClassMetadataEventArgs $args
@@ -61,11 +81,17 @@ class ResolveTargetEntityListener implements EventSubscriber
                 $this->remapAssociation($cm, $mapping);
             }
         }
+
+        foreach ($this->resolveTargetEntities as $interface => $data) {
+            if ($data['targetEntity'] == $cm->getName()) {
+                $args->getEntityManager()->getMetadataFactory()->setMetadataFor($interface, $cm);
+            }
+        }
     }
 
     /**
      * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $classMetadata
-     * @param array $mapping
+     * @param array                                   $mapping
      *
      * @return void
      */
@@ -95,7 +121,7 @@ class ResolveTargetEntityListener implements EventSubscriber
 
     /**
      * @param ClassMetadataInfo $classMetadata
-     * @param $mapping
+     * @param                   $mapping
      */
     protected function remapManyToManyAssociation(ClassMetadataInfo $classMetadata, $mapping)
     {
@@ -111,7 +137,7 @@ class ResolveTargetEntityListener implements EventSubscriber
 
     /**
      * @param ClassMetadataInfo $classMetadata
-     * @param $mapping
+     * @param                   $mapping
      */
     protected function remapManyToOneAssociation(ClassMetadataInfo $classMetadata, $mapping)
     {
@@ -120,7 +146,7 @@ class ResolveTargetEntityListener implements EventSubscriber
 
     /**
      * @param ClassMetadataInfo $classMetadata
-     * @param $mapping
+     * @param                   $mapping
      */
     protected function remapOneToManyAssociation(ClassMetadataInfo $classMetadata, $mapping)
     {
@@ -129,7 +155,7 @@ class ResolveTargetEntityListener implements EventSubscriber
 
     /**
      * @param ClassMetadataInfo $classMetadata
-     * @param $mapping
+     * @param                   $mapping
      */
     protected function remapOneToOneAssociation(ClassMetadataInfo $classMetadata, $mapping)
     {
