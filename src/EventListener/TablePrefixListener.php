@@ -60,12 +60,13 @@ class TablePrefixListener extends AbstractService
     {
         /** @var ClassMetadata $classMetadata */
         $classMetadata = $args->getClassMetadata();
-
         $classReflection = $classMetadata->getReflectionClass();
 
         if (!$classReflection) {
             return;
         }
+
+        $namingStrategy = $this->getEntityManager()->getConfiguration()->getNamingStrategy();
 
         $prefixes = new ArrayCollection();
 
@@ -84,7 +85,6 @@ class TablePrefixListener extends AbstractService
 
         // Do not re-apply the prefix in an inheritance hierarchy.
         if (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->isRootEntity()) {
-
             if ($this->getLoadedClasses()->contains($className)) {
                 return;
             } else {
@@ -102,16 +102,27 @@ class TablePrefixListener extends AbstractService
             if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY && isset($mapping['joinTable']['name'])) {
                 $sourceEntity = $mapping['sourceEntity'];
                 $targetEntity = $mapping['targetEntity'];
-                $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity);
+
+                if ($this->isUnidirectional($mapping)) {
+                    $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity . '-' . $fieldName);
+                } else {
+                    $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity);
+                }
 
                 // set only new associations
                 if (!$this->getProcessedAssociation()->contains($serial)) {
-                    $mappedTableName = $mapping['joinTable']['name'];
+                    if ($this->isUnidirectional($mapping)) {
+                        $newClassTableName = $namingStrategy->classToTableName($classReflection->getShortName());
+                        $newPropertyTableName = $namingStrategy->propertyToColumnName($mapping['fieldName']);
+                        $mappedTableName = $newClassTableName . $this->getTableNameSeparator() . $newPropertyTableName;
+                    } else {
+                        $mappedTableName = $mapping['joinTable']['name'] . $this->getTableNameSeparator() . 'map';
+                    }
 
-                    $mappedTableNameNew = $prefix . $this->getTableNameSeparator() . $mappedTableName . $this->getTableNameSeparator() . 'map';
+                    $mappedTableName = $prefix . $this->getTableNameSeparator() . $mappedTableName;
 
                     // remove interface name and save new name
-                    $mapping['joinTable']['name'] = $mappedTableNameNew;
+                    $mapping['joinTable']['name'] = $mappedTableName;
 
                     // set new association
                     unset($classMetadata->associationMappings[$mapping['fieldName']]);
@@ -276,6 +287,26 @@ class TablePrefixListener extends AbstractService
     protected function getNamespaceReplacements()
     {
         return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.namespace_prefix.replacements');
+    }
+
+    /**
+     * @param $mapping
+     *
+     * @return bool
+     */
+    protected function isUnidirectional($mapping)
+    {
+        return is_null($mapping['inversedBy']);
+    }
+
+    /**
+     * @param $mapping
+     *
+     * @return bool
+     */
+    protected function isBidirectional($mapping)
+    {
+        return !$this->isUnidirectional($mapping);
     }
 
     /**
