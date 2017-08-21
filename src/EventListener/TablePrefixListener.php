@@ -2,11 +2,12 @@
 
 namespace Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Tenolo\Bundle\CoreBundle\Service\AbstractService;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix;
 use Tenolo\Utilities\Utils\CryptUtil;
 
@@ -17,8 +18,14 @@ use Tenolo\Utilities\Utils\CryptUtil;
  * @author  Nikita Loges
  * @company tenolo GbR
  */
-class TablePrefixListener extends AbstractService
+class TablePrefixListener
 {
+
+    /** @var RegistryInterface */
+    protected $registry;
+
+    /** @var Reader */
+    protected $annotationReader;
 
     /** @var ArrayCollection */
     protected $loadedClasses;
@@ -26,12 +33,32 @@ class TablePrefixListener extends AbstractService
     /** @var ArrayCollection */
     protected $processedAssociation;
 
+    /** @var string */
+    protected $databasePrefix;
+
+    /** @var string */
+    protected $tableNameSeparator;
+
+    /** @var boolean */
+    protected $annotationPrefixEnable = true;
+
+    /** @var boolean */
+    protected $namespacePrefixEnable = true;
+
+    /** @var array */
+    protected $wordBlackList = [];
+
+    /** @var array */
+    protected $namespaceReplacements = [];
+
     /**
-     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+     * @param RegistryInterface $registry
+     * @param Reader            $annotationReader
      */
-    public function __construct($container)
+    public function __construct(RegistryInterface $registry, Reader $annotationReader)
     {
-        parent::__construct($container);
+        $this->registry = $registry;
+        $this->annotationReader = $annotationReader;
 
         $this->loadedClasses = new ArrayCollection();
         $this->processedAssociation = new ArrayCollection();
@@ -66,7 +93,8 @@ class TablePrefixListener extends AbstractService
             return;
         }
 
-        $namingStrategy = $this->getEntityManager()->getConfiguration()->getNamingStrategy();
+        $em = $this->getRegistry()->getEntityManagerForClass($classReflection->getName());
+        $namingStrategy = $em->getConfiguration()->getNamingStrategy();
 
         $prefixes = new ArrayCollection();
 
@@ -219,74 +247,19 @@ class TablePrefixListener extends AbstractService
     }
 
     /**
-     * @return string
+     * @return RegistryInterface
      */
-    protected function getDatabasePrefix()
+    public function getRegistry()
     {
-        $prefix = $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.database_prefix');
-
-        if (!empty($prefix)) {
-            $prefix = trim($prefix, '_');
-        }
-
-        return $prefix;
+        return $this->registry;
     }
 
     /**
-     * @return string
+     * @return Reader
      */
-    protected function getTableNameSeparator()
+    public function getAnnotationReader()
     {
-        return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.table_name_separator');
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function isAnnotationPrefixEnable()
-    {
-        return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.annotation_prefix.enable');
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function isNamespacePrefixEnable()
-    {
-        return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.namespace_prefix.enable');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getWordBlackList()
-    {
-        $blackList = array_merge($this->getDefaultWordBlackList(), $this->getConfigWordBlackList());
-
-        $blackList = array_map('trim', $blackList);
-        $blackList = array_filter($blackList, function ($value) {
-            return !empty($value);
-        });
-
-        $blackList = array_map('strtolower', $blackList);
-
-        return $blackList;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getConfigWordBlackList()
-    {
-        return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.namespace_prefix.word_blacklist');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getNamespaceReplacements()
-    {
-        return $this->getContainer()->getParameter('tenolo_doctrine_table_prefix.namespace_prefix.replacements');
+        return $this->annotationReader;
     }
 
     /**
@@ -326,5 +299,110 @@ class TablePrefixListener extends AbstractService
             'extension',
             'extensions'
         ];
+    }
+
+    /**
+     * @param array $wordBlackList
+     */
+    public function setWordBlackList(array $wordBlackList = [])
+    {
+        $this->wordBlackList = $wordBlackList;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWordBlackList()
+    {
+        $blackList = array_merge($this->getDefaultWordBlackList(), $this->wordBlackList);
+
+        $blackList = array_map('trim', $blackList);
+        $blackList = array_filter($blackList, function ($value) {
+            return !empty($value);
+        });
+
+        $blackList = array_map('strtolower', $blackList);
+
+        return $blackList;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDatabasePrefix()
+    {
+        return $this->databasePrefix;
+    }
+
+    /**
+     * @param string $databasePrefix
+     */
+    public function setDatabasePrefix($databasePrefix)
+    {
+        $this->databasePrefix = $databasePrefix;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableNameSeparator()
+    {
+        return $this->tableNameSeparator;
+    }
+
+    /**
+     * @param string $tableNameSeparator
+     */
+    public function setTableNameSeparator($tableNameSeparator)
+    {
+        $this->tableNameSeparator = $tableNameSeparator;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAnnotationPrefixEnable()
+    {
+        return $this->annotationPrefixEnable;
+    }
+
+    /**
+     * @param bool $annotationPrefixEnable
+     */
+    public function setAnnotationPrefixEnable($annotationPrefixEnable)
+    {
+        $this->annotationPrefixEnable = $annotationPrefixEnable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNamespacePrefixEnable()
+    {
+        return $this->namespacePrefixEnable;
+    }
+
+    /**
+     * @param bool $namespacePrefixEnable
+     */
+    public function setNamespacePrefixEnable($namespacePrefixEnable)
+    {
+        $this->namespacePrefixEnable = $namespacePrefixEnable;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNamespaceReplacements()
+    {
+        return $this->namespaceReplacements;
+    }
+
+    /**
+     * @param array $namespaceReplacements
+     */
+    public function setNamespaceReplacements($namespaceReplacements)
+    {
+        $this->namespaceReplacements = $namespaceReplacements;
     }
 }
