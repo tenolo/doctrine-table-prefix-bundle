@@ -45,6 +45,9 @@ class TablePrefixListener
     /** @var boolean */
     protected $namespacePrefixEnable = true;
 
+    /** @var boolean */
+    protected $renameRelations = true;
+
     /** @var array */
     protected $wordBlackList = [];
 
@@ -139,12 +142,17 @@ class TablePrefixListener
 
                 // set only new associations
                 if (!$this->getProcessedAssociation()->contains($serial)) {
-                    if ($this->isUnidirectional($mapping)) {
-                        $newClassTableName = $namingStrategy->classToTableName($classReflection->getShortName());
-                        $newPropertyTableName = $namingStrategy->propertyToColumnName($mapping['fieldName']);
-                        $mappedTableName = $newClassTableName . $this->getTableNameSeparator() . $newPropertyTableName;
+
+                    if($this->isRenameRelations()) {
+                        if ($this->isUnidirectional($mapping)) {
+                            $newClassTableName = $namingStrategy->classToTableName($classReflection->getShortName());
+                            $newPropertyTableName = $namingStrategy->propertyToColumnName($mapping['fieldName']);
+                            $mappedTableName = $newClassTableName . $this->getTableNameSeparator() . $newPropertyTableName;
+                        } else {
+                            $mappedTableName = $mapping['joinTable']['name'] . $this->getTableNameSeparator() . 'map';
+                        }
                     } else {
-                        $mappedTableName = $mapping['joinTable']['name'] . $this->getTableNameSeparator() . 'map';
+                        $mappedTableName = $mapping['joinTable']['name'];
                     }
 
                     $mappedTableName = $prefix . $this->getTableNameSeparator() . $mappedTableName;
@@ -190,9 +198,14 @@ class TablePrefixListener
                 unset($namespaceParts[$key]);
             } else {
                 if (!ctype_upper($value)) {
+                    $value = str_ireplace($blackList, '', $value);
                     $values = preg_split('/(?=[A-Z])/', $value);
 
                     $values = array_map('strtolower', $values);
+
+                    $values = array_filter($values, function ($value) use ($blackList) {
+                        return !in_array($value, $blackList);
+                    });
                     $values = array_map(function ($value) use ($replacements) {
                         if (array_key_exists($value, $replacements)) {
                             return $replacements[$value];
@@ -202,9 +215,6 @@ class TablePrefixListener
                     }, $values);
                     $values = array_filter($values, function ($el) {
                         return !empty($el);
-                    });
-                    $values = array_filter($values, function ($value) use ($blackList) {
-                        return !in_array($value, $blackList);
                     });
 
                     if (count($values) > 1) {
@@ -339,7 +349,7 @@ class TablePrefixListener
      */
     public function setDatabasePrefix($databasePrefix)
     {
-        $this->databasePrefix = $databasePrefix;
+        $this->databasePrefix = trim($databasePrefix, '_');
     }
 
     /**
@@ -404,5 +414,21 @@ class TablePrefixListener
     public function setNamespaceReplacements($namespaceReplacements)
     {
         $this->namespaceReplacements = $namespaceReplacements;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRenameRelations()
+    {
+        return $this->renameRelations;
+    }
+
+    /**
+     * @param bool $renameRelations
+     */
+    public function setRenameRelations($renameRelations)
+    {
+        $this->renameRelations = $renameRelations;
     }
 }
