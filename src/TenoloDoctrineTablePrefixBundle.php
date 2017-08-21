@@ -3,7 +3,9 @@
 namespace Tenolo\Bundle\DoctrineTablePrefixBundle;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection\Compiler\ResolveTargetEntityCompilerPass;
 
 /**
  * Class TenoloDoctrineTablePrefixBundle
@@ -22,5 +24,15 @@ class TenoloDoctrineTablePrefixBundle extends Bundle
     {
         // register doctrine annotation
         AnnotationRegistry::registerFile(__DIR__ . "/Doctrine/Annotations/Prefix.php");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new ResolveTargetEntityCompilerPass());
     }
 }

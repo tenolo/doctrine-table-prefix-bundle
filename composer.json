@@ -27,15 +27,15 @@
     "require": {
         "php": "~5.5|~7.0",
 
-        "symfony/framework-bundle": "~2.8|~3.0",
+        "symfony/framework-bundle": "~2.8|3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/doctrine-bridge": "~2.8|~3.0",
 
         "doctrine/orm": "~2.5",
         "doctrine/common": "~2.6",
 
-        "tenolo/core-bundle": "~3.0",
         "tenolo/utilities": "~1.3"
     },
     "require-dev": {
