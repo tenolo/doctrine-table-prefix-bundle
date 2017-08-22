@@ -7,6 +7,7 @@ services:
         calls:
             - ['setTableNameSeparator', ['%tenolo_doctrine_table_prefix.table_name_separator%']]
             - ['setDatabasePrefix', ['%tenolo_doctrine_table_prefix.database_prefix%']]
+            - ['setRenameRelations', ['%tenolo_doctrine_table_prefix.rename_join_table%']]
             - ['setAnnotationPrefixEnable', ['%tenolo_doctrine_table_prefix.annotation_prefix.enable%']]
             - ['setNamespacePrefixEnable', ['%tenolo_doctrine_table_prefix.namespace_prefix.enable%']]
             - ['setWordBlackList', ['%tenolo_doctrine_table_prefix.namespace_prefix.word_blacklist%']]
