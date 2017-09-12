@@ -7,55 +7,64 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Tenolo\Bundle\CoreBundle\Service\AbstractService;
-use Tenolo\Bundle\CoreBundle\Util\Crypt;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix;
+use Tenolo\Utilities\Utils\CryptUtil;
 
 /**
  * Class TablePrefixListener
  *
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener
- * @author Nikita Loges
+ * @author  Nikita Loges
  * @company tenolo GbR
- * @date 03.06.14
  */
-class TablePrefixListener extends AbstractService
+class TablePrefixListener
 {
 
-    /**
-     * @var string
-     */
-    protected $prefix = '';
+    /** @var RegistryInterface */
+    protected $registry;
 
-    /**
-     * @var ArrayCollection
-     */
+    /** @var Reader */
+    protected $annotationReader;
+
+    /** @var ArrayCollection */
     protected $loadedClasses;
 
-    /**
-     * @var ArrayCollection
-     */
+    /** @var ArrayCollection */
     protected $processedAssociation;
 
-    /**
-     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-     * @param $prefix
-     */
-    public function __construct($container, $prefix)
-    {
-        parent::__construct($container);
+    /** @var string */
+    protected $databasePrefix;
 
-        $this->prefix = (string)$prefix;
+    /** @var string */
+    protected $tableNameSeparator;
+
+    /** @var boolean */
+    protected $annotationPrefixEnable = true;
+
+    /** @var boolean */
+    protected $namespacePrefixEnable = true;
+
+    /** @var boolean */
+    protected $renameRelations = true;
+
+    /** @var array */
+    protected $wordBlackList = [];
+
+    /** @var array */
+    protected $namespaceReplacements = [];
+
+    /**
+     * @param RegistryInterface $registry
+     * @param Reader            $annotationReader
+     */
+    public function __construct(RegistryInterface $registry, Reader $annotationReader)
+    {
+        $this->registry = $registry;
+        $this->annotationReader = $annotationReader;
 
         $this->loadedClasses = new ArrayCollection();
         $this->processedAssociation = new ArrayCollection();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getPrefix()
-    {
-        return $this->prefix;
     }
 
     /**
@@ -81,51 +90,75 @@ class TablePrefixListener extends AbstractService
     {
         /** @var ClassMetadata $classMetadata */
         $classMetadata = $args->getClassMetadata();
-
         $classReflection = $classMetadata->getReflectionClass();
 
         if (!$classReflection) {
             return;
         }
 
-        $className = $classReflection->getName();
-        $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, 'Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix');
+        $em = $this->getRegistry()->getEntityManagerForClass($classReflection->getName());
+        $namingStrategy = $em->getConfiguration()->getNamingStrategy();
 
-        $prefix = $this->prefix;
-        if (!is_null($classAnnotation)) {
-            $tablePrefix = trim($classAnnotation->name);
+        $prefixes = new ArrayCollection();
 
-            if (!empty($tablePrefix)) {
-                $prefix .= $tablePrefix . "_";
-            }
+        $this->addDatabasePrefix($prefixes);
+
+        if ($this->isNamespacePrefixEnable()) {
+            $this->addNamespacePrefix($prefixes, $classReflection);
         }
+
+        if ($this->isAnnotationPrefixEnable()) {
+            $this->addAnnotationPrefix($prefixes, $classReflection);
+        }
+
+        $className = $classReflection->getName();
+        $prefix = implode($this->getTableNameSeparator(), $prefixes->toArray());
 
         // Do not re-apply the prefix in an inheritance hierarchy.
         if (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->isRootEntity()) {
-
             if ($this->getLoadedClasses()->contains($className)) {
                 return;
             } else {
                 $this->getLoadedClasses()->add($className);
             }
 
-            $classMetadata->setPrimaryTable(array(
-                'name' => $prefix . $classMetadata->getTableName()
-            ));
+            $classTableName = $prefix . $this->getTableNameSeparator() . $classMetadata->getTableName();
+
+            $classMetadata->setPrimaryTable([
+                'name' => $classTableName
+            ]);
         }
 
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
             if ($mapping['type'] == ClassMetadataInfo::MANY_TO_MANY && isset($mapping['joinTable']['name'])) {
                 $sourceEntity = $mapping['sourceEntity'];
                 $targetEntity = $mapping['targetEntity'];
-                $serial = Crypt::getHash($sourceEntity . '-' . $targetEntity);
+
+                if ($this->isUnidirectional($mapping)) {
+                    $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity . '-' . $fieldName);
+                } else {
+                    $serial = CryptUtil::getHash($sourceEntity . '-' . $targetEntity);
+                }
 
                 // set only new associations
                 if (!$this->getProcessedAssociation()->contains($serial)) {
-                    $mappedTableName = $mapping['joinTable']['name'];
+
+                    if($this->isRenameRelations()) {
+                        if ($this->isUnidirectional($mapping)) {
+                            $newClassTableName = $namingStrategy->classToTableName($classReflection->getShortName());
+                            $newPropertyTableName = $namingStrategy->propertyToColumnName($mapping['fieldName']);
+                            $mappedTableName = $newClassTableName . $this->getTableNameSeparator() . $newPropertyTableName;
+                        } else {
+                            $mappedTableName = $mapping['joinTable']['name'] . $this->getTableNameSeparator() . 'map';
+                        }
+                    } else {
+                        $mappedTableName = $mapping['joinTable']['name'];
+                    }
+
+                    $mappedTableName = $prefix . $this->getTableNameSeparator() . $mappedTableName;
 
                     // remove interface name and save new name
-                    $mapping['joinTable']['name'] = $prefix . $mappedTableName . '_map';
+                    $mapping['joinTable']['name'] = $mappedTableName;
 
                     // set new association
                     unset($classMetadata->associationMappings[$mapping['fieldName']]);
@@ -136,5 +169,266 @@ class TablePrefixListener extends AbstractService
                 }
             }
         }
+    }
+
+    /**
+     * @param ArrayCollection $collection
+     */
+    protected function addDatabasePrefix(ArrayCollection $collection)
+    {
+        $databasePrefix = $this->getDatabasePrefix();
+        if (!empty($databasePrefix)) {
+            $collection->add($databasePrefix);
+        }
+    }
+
+    /**
+     * @param ArrayCollection  $collection
+     * @param \ReflectionClass $classReflection
+     */
+    protected function addNamespacePrefix(ArrayCollection $collection, \ReflectionClass $classReflection)
+    {
+        $namespace = $classReflection->getNamespaceName();
+        $namespaceParts = explode('\\', $namespace);
+        $blackList = $this->getWordBlackList();
+        $replacements = $this->getNamespaceReplacements();
+
+        foreach ($namespaceParts as $key => $value) {
+            if (empty($value)) {
+                unset($namespaceParts[$key]);
+            } else {
+                if (!ctype_upper($value)) {
+                    $value = str_ireplace($blackList, '', $value);
+                    $values = preg_split('/(?=[A-Z])/', $value);
+
+                    $values = array_map('strtolower', $values);
+
+                    $values = array_filter($values, function ($value) use ($blackList) {
+                        return !in_array($value, $blackList);
+                    });
+                    $values = array_map(function ($value) use ($replacements) {
+                        if (array_key_exists($value, $replacements)) {
+                            return $replacements[$value];
+                        }
+
+                        return $value;
+                    }, $values);
+                    $values = array_filter($values, function ($el) {
+                        return !empty($el);
+                    });
+
+                    if (count($values) > 1) {
+                        $value = '';
+                        foreach ($values as $v) {
+                            $value .= $v[0];
+                        }
+                    } else {
+                        $value = array_shift($values);
+                    }
+                }
+
+                $namespaceParts[$key] = $value;
+            }
+        }
+
+        $namespaceParts = array_filter($namespaceParts, function ($el) {
+            return !empty($el);
+        });
+
+        $namespacePrefix = implode($this->getTableNameSeparator(), $namespaceParts);
+        $collection->add($namespacePrefix);
+    }
+
+    /**
+     * @param ArrayCollection  $collection
+     * @param \ReflectionClass $classReflection
+     */
+    protected function addAnnotationPrefix(ArrayCollection $collection, \ReflectionClass $classReflection)
+    {
+        $classAnnotation = $this->getAnnotationReader()->getClassAnnotation($classReflection, Prefix::class);
+
+        if (!is_null($classAnnotation)) {
+            $tablePrefix = trim($classAnnotation->name);
+
+            if (!empty($tablePrefix)) {
+                $collection->add($tablePrefix);
+            }
+        }
+    }
+
+    /**
+     * @return RegistryInterface
+     */
+    public function getRegistry()
+    {
+        return $this->registry;
+    }
+
+    /**
+     * @return Reader
+     */
+    public function getAnnotationReader()
+    {
+        return $this->annotationReader;
+    }
+
+    /**
+     * @param $mapping
+     *
+     * @return bool
+     */
+    protected function isUnidirectional($mapping)
+    {
+        return is_null($mapping['inversedBy']);
+    }
+
+    /**
+     * @param $mapping
+     *
+     * @return bool
+     */
+    protected function isBidirectional($mapping)
+    {
+        return !$this->isUnidirectional($mapping);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDefaultWordBlackList()
+    {
+        return [
+            'entity',
+            'entities',
+            'interface',
+            'interfaces',
+            'bundle',
+            'bundles',
+            'application',
+            'applications',
+            'extension',
+            'extensions'
+        ];
+    }
+
+    /**
+     * @param array $wordBlackList
+     */
+    public function setWordBlackList(array $wordBlackList = [])
+    {
+        $this->wordBlackList = $wordBlackList;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getWordBlackList()
+    {
+        $blackList = array_merge($this->getDefaultWordBlackList(), $this->wordBlackList);
+
+        $blackList = array_map('trim', $blackList);
+        $blackList = array_filter($blackList, function ($value) {
+            return !empty($value);
+        });
+
+        $blackList = array_map('strtolower', $blackList);
+
+        return $blackList;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDatabasePrefix()
+    {
+        return $this->databasePrefix;
+    }
+
+    /**
+     * @param string $databasePrefix
+     */
+    public function setDatabasePrefix($databasePrefix)
+    {
+        $this->databasePrefix = trim($databasePrefix, '_');
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableNameSeparator()
+    {
+        return $this->tableNameSeparator;
+    }
+
+    /**
+     * @param string $tableNameSeparator
+     */
+    public function setTableNameSeparator($tableNameSeparator)
+    {
+        $this->tableNameSeparator = $tableNameSeparator;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAnnotationPrefixEnable()
+    {
+        return $this->annotationPrefixEnable;
+    }
+
+    /**
+     * @param bool $annotationPrefixEnable
+     */
+    public function setAnnotationPrefixEnable($annotationPrefixEnable)
+    {
+        $this->annotationPrefixEnable = $annotationPrefixEnable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNamespacePrefixEnable()
+    {
+        return $this->namespacePrefixEnable;
+    }
+
+    /**
+     * @param bool $namespacePrefixEnable
+     */
+    public function setNamespacePrefixEnable($namespacePrefixEnable)
+    {
+        $this->namespacePrefixEnable = $namespacePrefixEnable;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNamespaceReplacements()
+    {
+        return $this->namespaceReplacements;
+    }
+
+    /**
+     * @param array $namespaceReplacements
+     */
+    public function setNamespaceReplacements($namespaceReplacements)
+    {
+        $this->namespaceReplacements = $namespaceReplacements;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRenameRelations()
+    {
+        return $this->renameRelations;
+    }
+
+    /**
+     * @param bool $renameRelations
+     */
+    public function setRenameRelations($renameRelations)
+    {
+        $this->renameRelations = $renameRelations;
     }
 }

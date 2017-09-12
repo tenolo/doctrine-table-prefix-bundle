@@ -1,10 +1,14 @@
-parameters:
-    tenolo_doctrine_table_prefix.event.table_prefix.class: Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener\TablePrefixListener
-    doctrine.orm.listeners.resolve_target_entity.class: Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener\ResolveTargetEntityListener
-
 services:
     tenolo_doctrine_table_prefix.event.table_prefix:
-        class: %tenolo_doctrine_table_prefix.event.table_prefix.class%
-        arguments: [@service_container, %database_prefix%]
+        class: Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener\TablePrefixListener
+        arguments: ['@doctrine', '@annotation_reader']
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata,  method: loadClassMetadata, priority: -10 }
+        calls:
+            - ['setTableNameSeparator', ['%tenolo_doctrine_table_prefix.table_name_separator%']]
+            - ['setDatabasePrefix', ['%tenolo_doctrine_table_prefix.database_prefix%']]
+            - ['setRenameRelations', ['%tenolo_doctrine_table_prefix.rename_join_table%']]
+            - ['setAnnotationPrefixEnable', ['%tenolo_doctrine_table_prefix.annotation_prefix.enable%']]
+            - ['setNamespacePrefixEnable', ['%tenolo_doctrine_table_prefix.namespace_prefix.enable%']]
+            - ['setWordBlackList', ['%tenolo_doctrine_table_prefix.namespace_prefix.word_blacklist%']]
+            - ['setNamespaceReplacements', ['%tenolo_doctrine_table_prefix.namespace_prefix.replacements%']]
