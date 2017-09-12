@@ -3,38 +3,36 @@
 namespace Tenolo\Bundle\DoctrineTablePrefixBundle;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Mmoreram\SymfonyBundleDependencies\DependentBundleInterface;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Tenolo\Bundle\CoreBundle\TenoloCoreBundle;
+use Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection\Compiler\ResolveTargetEntityCompilerPass;
 
 /**
  * Class TenoloDoctrineTablePrefixBundle
+ *
  * @package Tenolo\Bundle\DoctrineTablePrefixBundle
- * @author Nikita Loges
+ * @author  Nikita Loges
  * @company tenolo GbR
  */
-class TenoloDoctrineTablePrefixBundle extends Bundle implements DependentBundleInterface
+class TenoloDoctrineTablePrefixBundle extends Bundle
 {
 
     /**
-     * @inheritdoc
-     */
-    public static function getBundleDependencies(KernelInterface $kernel)
-    {
-        return [
-            FrameworkBundle::class,
-            TenoloCoreBundle::class,
-        ];
-    }
-
-    /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function boot()
     {
         // register doctrine annotation
-        AnnotationRegistry::registerFile(__DIR__."/Doctrine/Annotations/Prefix.php");
+        AnnotationRegistry::registerFile(__DIR__ . "/Doctrine/Annotations/Prefix.php");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new ResolveTargetEntityCompilerPass());
     }
 }
