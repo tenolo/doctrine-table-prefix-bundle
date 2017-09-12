@@ -21,9 +21,7 @@ class ResolveTargetEntityListener implements EventSubscriber
     /** @var array */
     protected $resolveTargetEntities = [];
 
-    /**
-     * @return array
-     */
+    /** @return array */
     public function getSubscribedEvents()
     {
         return [

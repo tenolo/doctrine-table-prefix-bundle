@@ -16,6 +16,7 @@ use Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection\Compiler\Resolve
  */
 class TenoloDoctrineTablePrefixBundle extends Bundle
 {
+
     /**
      * @inheritDoc
      */

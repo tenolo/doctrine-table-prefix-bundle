@@ -34,7 +34,7 @@
         "symfony/doctrine-bridge": "~2.8|~3.0",
 
         "doctrine/orm": "~2.5",
-        "doctrine/common": "~2.5",
+        "doctrine/common": "~2.6",
 
         "tenolo/utilities": "~1.3"
     },
