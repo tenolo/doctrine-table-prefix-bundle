@@ -18,7 +18,7 @@ class TenoloDoctrineTablePrefixExtension extends ConfigurableExtension
 {
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function loadInternal(array $config, ContainerBuilder $container)
     {

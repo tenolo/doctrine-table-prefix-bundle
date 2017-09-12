@@ -17,7 +17,7 @@ use Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection\Compiler\Resolve
 class TenoloDoctrineTablePrefixBundle extends Bundle
 {
     /**
-     * @{@inheritdoc}
+     * @inheritDoc
      */
     public function boot()
     {
