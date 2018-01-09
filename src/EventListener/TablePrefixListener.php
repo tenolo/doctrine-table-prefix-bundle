@@ -4,6 +4,7 @@ namespace Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -21,7 +22,7 @@ use Tenolo\Utilities\Utils\CryptUtil;
 class TablePrefixListener
 {
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var Reader */
@@ -55,10 +56,10 @@ class TablePrefixListener
     protected $namespaceReplacements = [];
 
     /**
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      * @param Reader            $annotationReader
      */
-    public function __construct(RegistryInterface $registry, Reader $annotationReader)
+    public function __construct(ManagerRegistry $registry, Reader $annotationReader)
     {
         $this->registry = $registry;
         $this->annotationReader = $annotationReader;
@@ -96,7 +97,7 @@ class TablePrefixListener
             return;
         }
 
-        $em = $this->getRegistry()->getEntityManagerForClass($classReflection->getName());
+        $em = $this->getRegistry()->getManagerForClass($classReflection->getName());
         $namingStrategy = $em->getConfiguration()->getNamingStrategy();
 
         $prefixes = new ArrayCollection();
@@ -257,7 +258,7 @@ class TablePrefixListener
     }
 
     /**
-     * @return RegistryInterface
+     * @return ManagerRegistry
      */
     public function getRegistry()
     {
