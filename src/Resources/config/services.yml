@@ -1,6 +1,7 @@
 services:
     tenolo_doctrine_table_prefix.event.table_prefix:
         class: Tenolo\Bundle\DoctrineTablePrefixBundle\EventListener\TablePrefixListener
+        public: false
         arguments: ['@doctrine', '@annotation_reader']
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata,  method: loadClassMetadata, priority: -10 }

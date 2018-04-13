@@ -8,7 +8,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Tenolo\Bundle\DoctrineTablePrefixBundle\Doctrine\Annotations\Prefix;
 use Tenolo\Utilities\Utils\CryptUtil;
 
@@ -57,7 +56,7 @@ class TablePrefixListener
 
     /**
      * @param ManagerRegistry $registry
-     * @param Reader            $annotationReader
+     * @param Reader          $annotationReader
      */
     public function __construct(ManagerRegistry $registry, Reader $annotationReader)
     {
@@ -144,7 +143,7 @@ class TablePrefixListener
                 // set only new associations
                 if (!$this->getProcessedAssociation()->contains($serial)) {
 
-                    if($this->isRenameRelations()) {
+                    if ($this->isRenameRelations()) {
                         if ($this->isUnidirectional($mapping)) {
                             $newClassTableName = $namingStrategy->classToTableName($classReflection->getShortName());
                             $newPropertyTableName = $namingStrategy->propertyToColumnName($mapping['fieldName']);

@@ -2,7 +2,6 @@
 
 namespace Tenolo\Bundle\DoctrineTablePrefixBundle;
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection\Compiler\ResolveTargetEntityCompilerPass;
@@ -16,15 +15,6 @@ use Tenolo\Bundle\DoctrineTablePrefixBundle\DependencyInjection\Compiler\Resolve
  */
 class TenoloDoctrineTablePrefixBundle extends Bundle
 {
-
-    /**
-     * @inheritDoc
-     */
-    public function boot()
-    {
-        // register doctrine annotation
-        AnnotationRegistry::registerFile(__DIR__ . "/Doctrine/Annotations/Prefix.php");
-    }
 
     /**
      * @inheritDoc
