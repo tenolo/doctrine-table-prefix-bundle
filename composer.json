@@ -39,12 +39,6 @@
 
         "tenolo/utilities": "~1.3"
     },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://repo.tenolo.com"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "Tenolo\\Bundle\\DoctrineTablePrefixBundle\\": "src/"
