@@ -227,7 +227,14 @@ class TablePrefixListener
                     }
                 }
 
-                $namespaceParts[$key] = $value;
+                $value = strtolower($value);
+
+                if (!in_array($value, $blackList)) {
+                    $namespaceParts[$key] = $value;
+                } else {
+                    unset($namespaceParts[$key]);
+                }
+
             }
         }
 
