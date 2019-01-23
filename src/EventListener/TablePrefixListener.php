@@ -113,6 +113,7 @@ class TablePrefixListener
 
         $className = $classReflection->getName();
         $prefix = implode($this->getTableNameSeparator(), $prefixes->toArray());
+        $prefix = rtrim($prefix, '_');  
 
         // Do not re-apply the prefix in an inheritance hierarchy.
         if (!$classMetadata->isInheritanceTypeSingleTable() || $classMetadata->isRootEntity()) {
@@ -242,7 +243,11 @@ class TablePrefixListener
             return !empty($el);
         });
 
-        $namespacePrefix = implode($this->getTableNameSeparator(), $namespaceParts);
+        if (!empty($namespaceParts)) {
+            $namespacePrefix = implode($this->getTableNameSeparator(), $namespaceParts);
+        } else {
+            $namespacePrefix = '';
+        }
         $collection->add($namespacePrefix);
     }
 
