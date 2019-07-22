@@ -12,12 +12,12 @@
     ],
     "type": "symfony-bundle",
     "license": "MIT",
-    "homepage": "http://tenolo.de",
+    "homepage": "https://tenolo.de",
     "authors": [
         {
             "name": "tenolo - Robert Bernis, Johannes Herberhold GbR",
             "email": "info@tenolo.de",
-            "homepage": "http://tenolo.de"
+            "homepage": "https://tenolo.de"
         },
         {
             "name": "Nikita Loges",
